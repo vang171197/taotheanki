@@ -60,20 +60,26 @@ function parseBlocks(text){
   const rows = [];
   for(const part of parts){
     const mJP  = part.match(/\[日本語文\]\s*(.+)/);
+    const mEN  = part.match(/\[英語文\]\s*(.+)/);
     const mAN  = part.match(/🔎\s*文解析\s*[:：]?\s*(.+)/);
     const mKEY = part.match(/📌\s*キーフレーズ\s*[:：]?\s*(.+)/);
     const mIMG = part.match(/🖼\s*画像キーワード\s*[:：]?\s*(.+)/);
+
     const jp  = mJP  ? mJP[1].trim()  : "";
+    const en  = mEN  ? mEN[1].trim()  : "";
     const an  = mAN  ? mAN[1].trim()  : "";
     const key = mKEY ? mKEY[1].trim() : "";
     const img = mIMG ? mIMG[1].trim() : "";
+
     if(jp){
-      // 5 cột: 1)JP 2)Analysis 3)Key phrase 4)(empty) 5)Image keyword
-      rows.push([jp, an, key, "", img]);
+      // mapping mới:
+      // 1) JP | 2) Analysis | 3) Key phrase | 4) empty | 5) Image | 6) empty | 7) EN
+      rows.push([jp, an, key, "", img, "", en]);
     }
   }
   return rows;
 }
+
 
 function toCSVNoHeader(rows){
   // CSV không header; quote tự động khi có dấu phẩy/xuống dòng/ngoặc kép

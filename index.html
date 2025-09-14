@@ -53,7 +53,6 @@ Excuse me, can you make this dish a bit spicier?
 
 <script>
 function normalize(text){ return (text||"").trim().replace(/\r\n/g,"\n").replace(/\r/g,"\n"); }
-
 function parseBlocks(text){
   const t = normalize(text);
   if(!t) return [];
@@ -61,16 +60,16 @@ function parseBlocks(text){
   const rows = [];
   for(const part of parts){
     const mJP  = part.match(/\[日本語文\]\s*(.+)/);
-    const mEN  = part.match(/\[英語文\]\s*(.+)/);
-    const mKEY = part.match(/📌\s*キーフレーズ:\s*(.+)/);
-    const mIMG = part.match(/🖼\s*画像キーワード:\s*(.+)/);
+    const mAN  = part.match(/🔎\s*文解析\s*[:：]?\s*(.+)/);
+    const mKEY = part.match(/📌\s*キーフレーズ\s*[:：]?\s*(.+)/);
+    const mIMG = part.match(/🖼\s*画像キーワード\s*[:：]?\s*(.+)/);
     const jp  = mJP  ? mJP[1].trim()  : "";
-    const en  = mEN  ? mEN[1].trim()  : "";
+    const an  = mAN  ? mAN[1].trim()  : "";
     const key = mKEY ? mKEY[1].trim() : "";
     const img = mIMG ? mIMG[1].trim() : "";
-    if(jp && en){
-      // 5 cột theo Note Type: 1)Sentence 2)Translation 3)Target Word 4)(trống) 5)Screenshot
-      rows.push([jp, en, key, "", img]);
+    if(jp){
+      // 5 cột: 1)JP 2)Analysis 3)Key phrase 4)(empty) 5)Image keyword
+      rows.push([jp, an, key, "", img]);
     }
   }
   return rows;

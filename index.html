@@ -19,30 +19,33 @@
   table { width:100%; border-collapse: collapse; margin-top:10px; font-size:14px; }
   th, td { border:1px solid #eee; padding:8px; vertical-align: top; }
   th { background:#fafafa; text-align:left; }
+  td { white-space: pre-wrap; } /* để preview thấy xuống dòng */
   @media (min-width: 900px){
     textarea{ height: 45vh; }
   }
 </style>
 </head>
+
 <body>
   <h1>Anki CSV Builder (JP-EN)</h1>
   <div class="hint">
-    Xuất CSV **5 cột, không header** theo thứ tự Note Type của bạn: <code>Sentence | Translation | Target Word | (trống) | Screenshot</code>.<br>
-    Dán dữ liệu → Preview → Tải CSV → Import trong Anki và map 5 cột theo thứ tự trên.
+    Xuất CSV <b>không header</b>. Mapping hiện tại của bạn đang là <b>7 cột</b>:<br>
+    <code>1) JP | 2) Analysis | 3) Key phrase | 4) (trống) | 5) Image | 6) (trống) | 7) EN</code><br>
+    Dán dữ liệu → Preview → Tải CSV → Import trong Anki và map theo đúng thứ tự cột.
   </div>
 
   <div class="row">
     <button class="btn" id="btnExample">Dán ví dụ</button>
     <button class="btn primary" id="btnDownload">Tải CSV</button>
-    <label><input type="checkbox" id="chkDedup" checked> Loại trùng theo Sentence</label>
+    <label><input type="checkbox" id="chkDedup" checked> Loại trùng theo JP (cột 1)</label>
   </div>
 
   <textarea id="input" placeholder="[日本語文]
-すみません、
-この料理はもう少し辛くできますか？
+すみません、この料理はもう少し辛くできますか？
+
 [英語文]
-Excuse me,
-can you make this dish a bit spicier?
+Excuse me, can you make this dish a bit spicier?
+
 📌 キーフレーズ: [Excuse me]::すみません,[a bit spicier]::もう少し辛く
 🖼 画像キーワード: restaurant waiter spicy dish"></textarea>
 
@@ -54,48 +57,53 @@ can you make this dish a bit spicier?
   <div id="preview"></div>
 
 <script>
-function normalize(text){ return (text||"").trim().replace(/\r\n/g,"\n").replace(/\r/g,"\n"); }
+function normalize(text){
+  return (text||"").trim().replace(/\r\n/g,"\n").replace(/\r/g,"\n");
+}
+
+// Bắt section [日本語文] / [英語文] dạng nhiều dòng
+function pickSection(part, label){
+  const re = new RegExp(
+    "\\[" + label + "\\]\\s*([\\s\\S]*?)(?=\\n\\[(?:日本語文|英語文)\\]|\\n🔎|\\n📌|\\n🖼|$)"
+  );
+  const m = part.match(re);
+  return m ? m[1].trim() : "";
+}
+
+// Bắt nội dung sau emoji (🔎/📌/🖼) dạng nhiều dòng
+function pickLineOrMulti(part, emoji){
+  const re = new RegExp(
+    emoji + "\\s*[^:：\\n]*\\s*[:：]?\\s*([\\s\\S]*?)(?=\\n\\[(?:日本語文|英語文)\\]|\\n🔎|\\n📌|\\n🖼|$)"
+  );
+  const m = part.match(re);
+  return m ? m[1].trim() : "";
+}
 
 function parseBlocks(text){
   const t = normalize(text);
   if(!t) return [];
-  
-  // Tách từng thẻ (Card) dựa trên tag bắt đầu [日本語文]
+
   const parts = t.split(/\n(?=\[日本語文\])/);
   const rows = [];
 
-  // Hàm helper để extract nội dung nhiều dòng
-  // Logic: Tìm marker -> lấy tất cả ký tự ([\s\S]*?) -> dừng khi gặp xuống dòng (\n) đi kèm với tag tiếp theo hoặc hết văn bản ($)
-  const extractRegex = (block, markerRegexSource) => {
-      // Regex này tìm: (Marker) + (Nội dung multiline) + (Lookahead: xuống dòng + tag khác HOẶC hết chuỗi)
-      // Tag khác được định nghĩa là bắt đầu bằng [, 🔎, 📌, hoặc 🖼
-      const re = new RegExp(`(${markerRegexSource})\\s*([\\s\\S]*?)(?=\\n(?:(?:\\[)|🔎|📌|🖼)|$)`, 'i');
-      const m = block.match(re);
-      return m ? m[2].trim() : "";
-  };
-
   for(const part of parts){
-    // Định nghĩa regex cho từng phần header
-    const jp  = extractRegex(part, "\\[日本語文\\]");
-    const en  = extractRegex(part, "\\[英語文\\]");
-    const an  = extractRegex(part, "🔎\\s*文解析\\s*[:：]?");
-    const key = extractRegex(part, "📌\\s*キーフレーズ\\s*[:：]?");
-    const img = extractRegex(part, "🖼\\s*画像キーワード\\s*[:：]?");
+    const jp  = pickSection(part, "日本語文");
+    const en  = pickSection(part, "英語文");
+    const an  = pickLineOrMulti(part, "🔎");
+    const key = pickLineOrMulti(part, "📌");
+    const img = pickLineOrMulti(part, "🖼");
 
-    // Chỉ cần có Tiếng Nhật là coi như hợp lệ
     if(jp){
-      // 1) JP | 2) Analysis | 3) Key phrase | 4) empty | 5) Image | 6) empty | 7) EN
+      // 7 cột: JP | Analysis | Key | empty | Image | empty | EN
       rows.push([jp, an, key, "", img, "", en]);
     }
   }
   return rows;
 }
 
-
 function toCSVNoHeader(rows){
   const escape = (v) => {
     const s = String(v ?? "");
-    // Excel/Anki cần quote nếu có: dấu phẩy, xuống dòng, hoặc ngoặc kép
     const need = /[",\n]/.test(s);
     const e = s.replace(/"/g, '""');
     return need ? `"${e}"` : e;
@@ -105,27 +113,36 @@ function toCSVNoHeader(rows){
 
 function setStatus(msg){ document.getElementById("status").textContent = msg; }
 
+function escapeHTML(s){
+  return String(s ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;");
+}
+
 function renderPreview(rows){
   const el = document.getElementById("preview");
   if(rows.length===0){ el.innerHTML=""; return; }
-  
-  // Render thẻ HTML cho xuống dòng để dễ nhìn trong preview (thay \n bằng <br>)
-  const formatCell = (text) => {
-      if(!text) return "";
-      let safe = text.replace(/&/g,"&amp;").replace(/</g,"&lt;");
-      return safe.replace(/\n/g, "<br>");
-  };
 
-  const head = `<tr><th>Sentence</th><th>Translation</th><th>Target Word</th><th>(empty)</th><th>Screenshot</th></tr>`;
-  const body = rows.slice(0,10).map(r=>`<tr>
-      <td>${formatCell(r[0])}</td>
-      <td>${formatCell(r[1])}</td>
-      <td>${formatCell(r[2])}</td>
-      <td>${formatCell(r[3])}</td>
-      <td>${formatCell(r[4])}</td>
-  </tr>`).join("");
-  
-  el.innerHTML = `<table>${head}${body}</table><div class="status">Hiển thị tối đa 10 dòng xem trước • Tổng: ${rows.length}</div>`;
+  const head = `
+    <tr>
+      <th>JP (1)</th>
+      <th>Analysis (2)</th>
+      <th>Key phrase (3)</th>
+      <th>Empty (4)</th>
+      <th>Image (5)</th>
+      <th>Empty (6)</th>
+      <th>EN (7)</th>
+    </tr>`;
+
+  const body = rows.slice(0,10).map(r=>{
+    return `<tr>${
+      r.map(c=>`<td>${escapeHTML(c)}</td>`).join("")
+    }</tr>`;
+  }).join("");
+
+  el.innerHTML = `<table>${head}${body}</table>
+    <div class="status">Hiển thị tối đa 10 thẻ xem trước • Tổng: ${rows.length}</div>`;
 }
 
 function downloadCSV(filename, csvText){
@@ -138,23 +155,29 @@ function downloadCSV(filename, csvText){
   setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); }, 0);
 }
 
-// Cập nhật ví dụ để test tính năng xuống dòng
 const EXAMPLE = `[日本語文]
-すみません、
-この料理はもう少し辛くできますか？
+すみません、この料理はもう少し辛くできますか？
+（※追加の一文：おすすめもありますか？）
+
 [英語文]
-Excuse me,
-can you make this dish a bit spicier?
-📌 キーフレーズ: [Excuse me]::すみません,
+Excuse me, can you make this dish a bit spicier?
+(Also, do you have any recommendations?)
+
+📌 キーフレーズ:
+[Excuse me]::すみません
 [a bit spicier]::もう少し辛く
+[recommendations]::おすすめ
+
 🖼 画像キーワード: restaurant waiter spicy dish
 
 [日本語文]
 明日のテストのために、
 この問題を一緒に解きませんか？
+
 [英語文]
 Shall we solve this problem together
 for tomorrow's test?
+
 📌 キーフレーズ: [Shall we ~ ?]::一緒に〜しませんか？
 🖼 画像キーワード: school desk students textbook`;
 
@@ -166,8 +189,10 @@ function currentRows(){
   if($chk.checked){
     const seen = new Set();
     rows = rows.filter(r=>{
-      if(seen.has(r[0])) return false;
-      seen.add(r[0]); return true;
+      const key = r[0]; // dedup theo JP
+      if(seen.has(key)) return false;
+      seen.add(key);
+      return true;
     });
   }
   return rows;
@@ -183,7 +208,7 @@ document.getElementById("btnExample").addEventListener("click", ()=>{
 document.getElementById("btnPreview").addEventListener("click", ()=>{
   const rows = currentRows();
   if(rows.length===0){
-    alert("Chưa tìm thấy thẻ hợp lệ. Mỗi block cần có [日本語文] và [英語文].");
+    alert("Chưa tìm thấy thẻ hợp lệ. Mỗi block cần có [日本語文] (JP).");
   }
   setStatus(`Số thẻ hợp lệ: ${rows.length}`);
   renderPreview(rows);
@@ -204,5 +229,6 @@ $input.addEventListener("input", ()=>{
   setStatus(`Số thẻ hợp lệ: ${rows.length}`);
 });
 </script>
+
 </body>
 </html>

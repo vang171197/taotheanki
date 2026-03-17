@@ -31,7 +31,7 @@
   <div class="hint">
     Xuất CSV <b>không header</b>. Mapping hiện tại của bạn đang là <b>7 cột</b>:<br>
     <code>1) JP | 2) Analysis | 3) Key phrase | 4) (trống) | 5) Image | 6) (trống) | 7) EN</code><br>
-    Dán dữ liệu → Preview → Tải CSV → Import trong Anki và map theo đúng thứ tự cột.13:371
+    Dán dữ liệu → Preview → Tải CSV → Import trong Anki và map theo đúng thứ tự cột.111
   </div>
 
   <div class="row">
@@ -64,7 +64,7 @@ function normalize(text){
 // Bắt section [日本語文] / [英語文] dạng nhiều dòng
 function pickSection(part, label){
   const re = new RegExp(
-    "\\[" + label + "\\]\\s*([\\s\\S]*?)(?=\\n\\[(?:英語文|日本語文)\\]|\\n🔎|\\n👍|\\n📌|\\n🖼|$)"
+    "\\[" + label + "\\]\\s*([\\s\\S]*?)(?=\\n\\[(?:日本語文|英語文)\\]|\\n🔎|\\n📌|\\n🖼|$)"
   );
   const m = part.match(re);
   return m ? m[1].trim() : "";
@@ -73,7 +73,7 @@ function pickSection(part, label){
 // Bắt nội dung sau emoji (🔎/📌/🖼) dạng nhiều dòng
 function pickLineOrMulti(part, emoji){
   const re = new RegExp(
-    emoji + "\\s*[^:：\\n]*\\s*[:：]?\\s*([\\s\\S]*?)(?=\\n\\[(?:英語文|日本語文)\\]|\\n🔎|\\n👍|\\n📌|\\n🖼|$)"
+    emoji + "\\s*[^:：\\n]*\\s*[:：]?\\s*([\\s\\S]*?)(?=\\n\\[(?:日本語文|英語文)\\]|\\n🔎|\\n📌|\\n🖼|$)"
   );
   const m = part.match(re);
   return m ? m[1].trim() : "";
@@ -87,18 +87,15 @@ function parseBlocks(text){
   const rows = [];
 
   for(const part of parts){
-    
-    const en  = pickSection(part, "英語文");
     const jp  = pickSection(part, "日本語文");
+    const en  = pickSection(part, "英語文");
     const an  = pickLineOrMulti(part, "🔎");
-    
-    const q = pickLineOrMulti(part, "👍");
     const key = pickLineOrMulti(part, "📌");
     const img = pickLineOrMulti(part, "🖼");
 
     if(jp){
       // 7 cột: JP | Analysis | Key | empty | Image | empty | EN
-      rows.push([jp, an, key, "", img, "", en, "", "", "", "", "", "", "", q]);
+      rows.push([jp, an, key, "", img, "", en]);
     }
   }
   return rows;
@@ -233,5 +230,1685 @@ $input.addEventListener("input", ()=>{
 });
 </script>
 
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en"> 
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pro Auto Card - 1280px Centered</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Noto+Serif+JP:wght@700&display=swap" rel="stylesheet">
+<style>.quiz-instruction {
+    font-size: 32px;
+    color: #fff; 
+    font-weight: 900;
+    margin-bottom: 25px; /* Tăng khoảng cách dưới một chút cho thoáng */
+    text-align: center;
+    
+    /* --- PHẦN THÊM MỚI: NỀN ĐEN --- */
+    background-color: rgba(0, 0, 0, 0.8); /* Đen mờ 80% để vẫn thấy nền đằng sau nhẹ nhẹ */
+    padding: 15px 35px; /* Khoảng cách từ chữ đến mép nền đen */
+    border-radius: 15px; /* Bo góc cho mượt mà */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Viền mảnh để trông cao cấp hơn */
+    display: inline-block; /* Quan trọng: Để nền đen ôm sát theo độ dài của chữ */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5); /* Đổ bóng cho cái hộp nổi bật lên */
+    /* ------------------------------ */
+
+    width: auto; /* Để inline-block tự quyết định chiều rộng */
+    max-width: 90%; /* Tránh việc chữ quá dài bị chạm mép màn hình */
+    
+    animation: fadeInInstruction 1.0s ease-out forwards;
+}
+
+@keyframes fadeInInstruction {
+    from { 
+        opacity: 0; 
+        transform: translateY(40px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+/* === CẤU HÌNH CỐ ĐỊNH 1280PX === */
+.migaku-card-back { 
+    width: 1680px !important; 
+    max-width: 100% !important; 
+    margin: 0 auto; 
+    background: #1212121; /* Đã sửa mã màu lỗi #1212121 */
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
+    padding-bottom: 40px;
+    min-height: 720px;
+}
+
+.center-container { 
+    display: flex; flex-direction: column; align-items: center; 
+    padding: 20px 20px; 
+}
+
+/* === TÂM ĐIỂM ACTION ZONE === */
+.action-zone {
+    position: relative;
+    width: 100%;
+    height: 350px; /* Tăng nhẹ không gian cho chữ 正確は */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.stack-item {
+    position: absolute;
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    opacity: 0;
+    pointer-events: none;
+    text-align: center;
+}
+
+/* 1. Ảnh Dấu hỏi & Hiệu ứng Bass */
+#standby-wrap { 
+    width: 240px; height: 240px; border-radius: 20%; 
+    background: #0000FF; display: flex; justify-content: center; 
+    align-items: center; opacity: 1; z-index: 3;
+    position: relative;
+    box-shadow: 0 15px 35px rgba(0,0,255,0.4);
+    animation: sound-pulse 1.2s ease-in-out infinite;
+}
+#standby-wrap::before, #standby-wrap::after {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    border: 6px solid #0000FF; border-radius: 20%; z-index: -1; opacity: 0;
+    animation: sonic-wave 1.2s linear infinite;
+}
+#standby-wrap::after { animation-delay: 0.4s; }
+@keyframes sound-pulse { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.08); } 45% { transform: scale(1.04); } }
+@keyframes sonic-wave { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(1.4); opacity: 0; } }
+#standby-wrap.hide { animation: none !important; transform: scale(0) rotate(-180deg); opacity: 0; }
+
+/* 2. Vòng tròn Đếm ngược */
+#countdown { 
+    width: 200px; height: 200px; background: #FF0000; 
+    border-radius: 100%; display: flex; justify-content: center; 
+    align-items: center; color: #fff; font-size: 100px; font-weight: bold; 
+    transform: scale(0.5); z-index: 2;
+}
+#countdown.active { opacity: 1; transform: scale(1); animation: pulseGlow 1s infinite; }
+@keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.6); } 70% { box-shadow: 0 0 0 25px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
+
+/* 3. Văn bản "CHÍNH XÁC LÀ" */
+#correct-label {
+    font-size: 80px;
+    font-weight: 900;
+    color: #FFD54A;
+    text-shadow: 0 0 20px rgba(255, 213, 74, 0.5);
+    z-index: 5;
+    transform: scale(0.8);
+}
+#correct-label.show { opacity: 1; transform: scale(1); }
+
+/* 4. Kết quả Câu văn */
+#result-display { width: 95%; max-width: 1100px; z-index: 4; transform: translateY(30px); }
+#result-display.show { opacity: 1; transform: translateY(0); }
+.res-notes { font-size: 48px; color: #ffd54a; font-weight: 800; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
+.res-sent { font-size: 34px; color: #00e5ff; font-family: "Noto Serif JP", serif; margin-top: 10px; }
+
+/* Đáp án */
+#answer-list-container { display: flex; flex-direction: column; gap: 20px; width: 85%; max-width: 1200px; margin-top: 10px; }
+.answer-item { padding: 18px; background: #1e1e1e; border-radius: 15px; font-size: 34px; border: 2px solid #333; transition: 0.4s; text-align: left;}
+.flash-correct { animation: blinkGreen 0.5s step-end infinite alternate; border-color: #00FF00 !important; font-weight: bold; }
+@keyframes blinkGreen { 50% { background-color: #006400; box-shadow: 0 0 25px rgba(0,255,0,0.4); } }
+</style>
+</head>
+
+<body>
+<div class="migaku-card migaku-card-back">
+    <div class="migaku-header" style="padding:10px; display: flex; gap:10px;">
+        <button id="start-learning-btn" onclick="startSession()" style="background:#4CAF50; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">Bắt đầu học</button>
+        <button onclick="sessionStorage.removeItem('ankiStartedThisSession')" style="background:#444; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">🔄 Reset</button>
+    </div>
+
+    <div class="center-container">
+        <div id="abc-text"></div>
+
+        <div class="action-zone">
+            <div id="standby-wrap" class="stack-item">
+                <img src="https://pomf2.lain.la/f/nnu6vgh9.png" style="width:70%;">
+            </div>    
+            <div id="countdown" class="stack-item">8</div>
+            <div id="correct-label" class="stack-item">正解は… </div>
+            <div id="result-display" class="stack-item">
+                <div id="show-notes" class="res-notes"></div>
+                <div id="show-sentence" class="res-sent"></div>
+            </div>
+        </div>
+<div class="quiz-instruction">今聞いた英語の意味として正しい日本語はどれ？</div>
+        <div id="answer-list-container">
+            <div id="item-A" class="answer-item"></div>
+            <div id="item-B" class="answer-item"></div>
+            <div id="item-C" class="answer-item"></div>
+        </div>
+    </div>
+</div>
+
+<audio id="countdown-beep-sound" src="https://pomf2.lain.la/f/kxzyuoy.MP31" preload="auto"></audio>
+<audio id="audioJP" preload="auto"></audio>
+
+<script>
+/* 1. KHỞI TẠO ĐÁP ÁN */
+(function initAnswers() {
+    const raw = `{{tiengnhat}}`;
+    const items = raw.split('|');
+    window.correctChoiceId = "";
+    items.forEach(item => {
+        let text = item.trim();
+        let isCorrect = text.startsWith('*');
+        if (isCorrect) text = text.substring(1);
+        const label = text.split(':')[0];
+        const el = document.getElementById("item-" + label);
+        if (el) {
+            el.textContent = text;
+            if (isCorrect) window.correctChoiceId = "item-" + label;
+        }
+    });
+})();
+
+/* 2. LOGIC TỰ ĐỘNG CHUYỂN CẢNH */
+(function(){
+    const countdownEl = document.getElementById("countdown");
+    const standbyWrap = document.getElementById("standby-wrap");
+    const correctLabel = document.getElementById("correct-label");
+    const resultDisplay = document.getElementById("result-display");
+    const beep = document.getElementById("countdown-beep-sound");
+    let isRunning = false;
+
+    window.startCountdownAfterAudio = function(){
+        if (isRunning) return;
+        isRunning = true;
+        standbyWrap.classList.add("hide");
+
+        setTimeout(() => {
+            countdownEl.classList.add("active");
+            beep.play().catch(e => {});
+            let count = 8;
+            countdownEl.textContent = count;
+            let timerId = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    countdownEl.textContent = count;
+                } else {
+                    clearInterval(timerId);
+                    revealFinalResult();
+                }
+            }, 1000);
+        }, 600); 
+    }
+
+    async function revealFinalResult(){
+        // Tắt đếm ngược
+        countdownEl.classList.remove("active");
+        setTimeout(() => { countdownEl.style.display = "none"; }, 500);
+
+        // BƯỚC A: Hiện chữ "正確は" trong 500ms
+        correctLabel.classList.add("show");
+        await new Promise(r => setTimeout(r, 1000));
+        correctLabel.classList.remove("show");
+        await new Promise(r => setTimeout(r, 300)); // Nghỉ ngắn sau khi tắt chữ
+
+        // BƯỚC B: Nhấp nháy đáp án và hiện câu văn
+        if (window.correctChoiceId) {
+            document.getElementById(window.correctChoiceId).classList.add("flash-correct");
+        }
+        document.getElementById("show-notes").textContent = `{{Notes}}`;
+        document.getElementById("show-sentence").textContent = `{{Sentence}}`;
+        resultDisplay.classList.add("show");
+
+        // BƯỚC C: TRÌNH TỰ TTS (TIẾNG NHẬT -> TIẾNG ANH 1.0 -> TIẾNG ANH 0.6)
+        
+        // 1. Đọc tiếng Nhật (Sentence)
+        if (window.triggerSentenceTTS) {
+            await window.triggerSentenceTTS();
+        }
+
+        // 2. Delay 510ms
+        await new Promise(r => setTimeout(r, 510));
+
+        // 3. Đọc tiếng Anh lần 1 (Notes - Speed 1.0)
+        if (window.triggerNotesTTS) {
+            await window.triggerNotesTTS(1.0);
+        }
+
+        // 4. Delay 520ms
+        await new Promise(r => setTimeout(r, 520));
+
+        // 5. Đọc tiếng Anh lần 2 (Notes - Speed 0.6)
+        if (window.triggerNotesTTS) {
+            await window.triggerNotesTTS(0.8);
+        }
+
+        // 6. Delay 2000ms rồi lật thẻ
+        await new Promise(r => setTimeout(r, 2000));
+        if (typeof pycmd === "function") pycmd("ans");
+    }
+})();
+
+/* 3. LOGIC AUDIO & TTS */
+(function(){
+  const NOTES_TEXT = (`{{Notes}}` || "").trim();
+  const SENTENCE_TEXT = (`{{Sentence}}` || "").trim();
+  const API_KEY = "AIzaSyAs1PQ3EPa7NGGxuJL-ZT1Ob1aQLwHiyfc";
+
+  const el = { audio: document.getElementById('audioJP'), firstBtn: document.getElementById('start-learning-btn'), abcText: document.getElementById('abc-text') };
+
+  async function synthTTS(text, voice, rate, lang){
+    const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${API_KEY}`;
+    const body = { input: { text }, voice: { languageCode: lang, name: voice }, audioConfig: { audioEncoding: "MP3", speakingRate: rate } };
+    const res = await fetch(url, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(body) });
+    const data = await res.json();
+    return `data:audio/mp3;base64,${data.audioContent}`;
+  }
+
+  async function playOnce(src){
+    return new Promise((resolve)=>{
+      el.audio.onended = ()=> resolve();
+      el.audio.src = src;
+      el.audio.play().catch(()=>{ if(el.firstBtn) el.firstBtn.style.display="block"; });
+    });
+  }
+
+  // Hàm đọc Sentence (Tiếng Nhật)
+  window.triggerSentenceTTS = async function() {
+      const url = await synthTTS(SENTENCE_TEXT, "ja-JP-Neural2-B", 1.0, "ja-JP");
+      await playOnce(url);
+  };
+
+  // Hàm đọc Notes (Tiếng Anh) với tốc độ tùy biến
+  window.triggerNotesTTS = async function(speed) {
+      const url = await synthTTS(NOTES_TEXT, "en-US-Chirp3-HD-Aoede", speed, "en-US");
+      await playOnce(url);
+  };
+
+  async function runSequence(){
+    const wait = (ms)=> new Promise(r=>setTimeout(r, ms));
+    await wait(200);
+    // Play audio mở đầu (MP3 cũ của bạn)
+    await playOnce("https://files.catbox.moe/vuvhkq.mp3");
+    
+    // Play 1 (Rabbit)
+    el.abcText.textContent = " "; el.abcText.classList.add("play-status");
+    const u1 = await synthTTS(NOTES_TEXT, "en-US-Chirp3-HD-Aoede", 1.0, "en-US"); 
+    await playOnce(u1); 
+    
+    await playOnce("https://pomf2.lain.la/f/9k9honkr.MP3");
+    await wait(600);
+    
+    // Play 2 (Turtle)
+    el.abcText.textContent = " ";
+    const u2 = await synthTTS(NOTES_TEXT, "en-US-Neural2-D", 0.7, "en-US"); 
+    await playOnce(u2); 
+    
+    el.abcText.textContent = ""; el.abcText.classList.remove("play-status");
+    await wait(1500);
+    if (window.startCountdownAfterAudio) window.startCountdownAfterAudio();
+  }
+
+  if (!sessionStorage.getItem("ankiStartedThisSession")) {
+    if(el.firstBtn) el.firstBtn.style.display = "block";
+    window.startSession = async function(){
+      sessionStorage.setItem("ankiStartedThisSession", "yes");
+      el.firstBtn.style.display = "none";
+      await runSequence();
+    };
+  } else {
+    setTimeout(runSequence, 500);
+  }
+})();
+</script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en"> 
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pro Auto Card - 1280px Centered</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Noto+Serif+JP:wght@700&display=swap" rel="stylesheet">
+<style>.quiz-instruction {
+    font-size: 32px;
+    color: #fff; 
+    font-weight: 900;
+    margin-bottom: 25px; /* Tăng khoảng cách dưới một chút cho thoáng */
+    text-align: center;
+    
+    /* --- PHẦN THÊM MỚI: NỀN ĐEN --- */
+    background-color: rgba(0, 0, 0, 0.8); /* Đen mờ 80% để vẫn thấy nền đằng sau nhẹ nhẹ */
+    padding: 15px 35px; /* Khoảng cách từ chữ đến mép nền đen */
+    border-radius: 15px; /* Bo góc cho mượt mà */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Viền mảnh để trông cao cấp hơn */
+    display: inline-block; /* Quan trọng: Để nền đen ôm sát theo độ dài của chữ */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5); /* Đổ bóng cho cái hộp nổi bật lên */
+    /* ------------------------------ */
+
+    width: auto; /* Để inline-block tự quyết định chiều rộng */
+    max-width: 90%; /* Tránh việc chữ quá dài bị chạm mép màn hình */
+    
+    animation: fadeInInstruction 1.0s ease-out forwards;
+}
+
+@keyframes fadeInInstruction {
+    from { 
+        opacity: 0; 
+        transform: translateY(40px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+/* === CẤU HÌNH CỐ ĐỊNH 1280PX === */
+.migaku-card-back { 
+    width: 1680px !important; 
+    max-width: 100% !important; 
+    margin: 0 auto; 
+    background: #1212121; /* Đã sửa mã màu lỗi #1212121 */
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
+    padding-bottom: 40px;
+    min-height: 720px;
+}
+
+.center-container { 
+    display: flex; flex-direction: column; align-items: center; 
+    padding: 20px 20px; 
+}
+
+/* === TÂM ĐIỂM ACTION ZONE === */
+.action-zone {
+    position: relative;
+    width: 100%;
+    height: 350px; /* Tăng nhẹ không gian cho chữ 正確は */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.stack-item {
+    position: absolute;
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    opacity: 0;
+    pointer-events: none;
+    text-align: center;
+}
+
+/* 1. Ảnh Dấu hỏi & Hiệu ứng Bass */
+#standby-wrap { 
+    width: 240px; height: 240px; border-radius: 20%; 
+    background: #0000FF; display: flex; justify-content: center; 
+    align-items: center; opacity: 1; z-index: 3;
+    position: relative;
+    box-shadow: 0 15px 35px rgba(0,0,255,0.4);
+    animation: sound-pulse 1.2s ease-in-out infinite;
+}
+#standby-wrap::before, #standby-wrap::after {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    border: 6px solid #0000FF; border-radius: 20%; z-index: -1; opacity: 0;
+    animation: sonic-wave 1.2s linear infinite;
+}
+#standby-wrap::after { animation-delay: 0.4s; }
+@keyframes sound-pulse { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.08); } 45% { transform: scale(1.04); } }
+@keyframes sonic-wave { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(1.4); opacity: 0; } }
+#standby-wrap.hide { animation: none !important; transform: scale(0) rotate(-180deg); opacity: 0; }
+
+/* 2. Vòng tròn Đếm ngược */
+#countdown { 
+    width: 200px; height: 200px; background: #FF0000; 
+    border-radius: 100%; display: flex; justify-content: center; 
+    align-items: center; color: #fff; font-size: 100px; font-weight: bold; 
+    transform: scale(0.5); z-index: 2;
+}
+#countdown.active { opacity: 1; transform: scale(1); animation: pulseGlow 1s infinite; }
+@keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.6); } 70% { box-shadow: 0 0 0 25px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
+
+/* 3. Văn bản "CHÍNH XÁC LÀ" */
+#correct-label {
+    font-size: 80px;
+    font-weight: 900;
+    color: #FFD54A;
+    text-shadow: 0 0 20px rgba(255, 213, 74, 0.5);
+    z-index: 5;
+    transform: scale(0.8);
+}
+#correct-label.show { opacity: 1; transform: scale(1); }
+
+/* 4. Kết quả Câu văn */
+#result-display { width: 95%; max-width: 1100px; z-index: 4; transform: translateY(30px); }
+#result-display.show { opacity: 1; transform: translateY(0); }
+.res-notes { font-size: 48px; color: #ffd54a; font-weight: 800; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
+.res-sent { font-size: 34px; color: #00e5ff; font-family: "Noto Serif JP", serif; margin-top: 10px; }
+
+/* Đáp án */
+#answer-list-container { display: flex; flex-direction: column; gap: 20px; width: 85%; max-width: 1200px; margin-top: 10px; }
+.answer-item { padding: 18px; background: #1e1e1e; border-radius: 15px; font-size: 34px; border: 2px solid #333; transition: 0.4s; text-align: left;}
+.flash-correct { animation: blinkGreen 0.5s step-end infinite alternate; border-color: #00FF00 !important; font-weight: bold; }
+@keyframes blinkGreen { 50% { background-color: #006400; box-shadow: 0 0 25px rgba(0,255,0,0.4); } }
+</style>
+</head>
+
+<body>
+<div class="migaku-card migaku-card-back">
+    <div class="migaku-header" style="padding:10px; display: flex; gap:10px;">
+        <button id="start-learning-btn" onclick="startSession()" style="background:#4CAF50; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">Bắt đầu học</button>
+        <button onclick="sessionStorage.removeItem('ankiStartedThisSession')" style="background:#444; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">🔄 Reset</button>
+    </div>
+
+    <div class="center-container">
+        <div id="abc-text"></div>
+
+        <div class="action-zone">
+            <div id="standby-wrap" class="stack-item">
+                <img src="https://pomf2.lain.la/f/nnu6vgh9.png" style="width:70%;">
+            </div>    
+            <div id="countdown" class="stack-item">8</div>
+            <div id="correct-label" class="stack-item">正解は… </div>
+            <div id="result-display" class="stack-item">
+                <div id="show-notes" class="res-notes"></div>
+                <div id="show-sentence" class="res-sent"></div>
+            </div>
+        </div>
+<div class="quiz-instruction">今聞いた英語の意味として正しい日本語はどれ？</div>
+        <div id="answer-list-container">
+            <div id="item-A" class="answer-item"></div>
+            <div id="item-B" class="answer-item"></div>
+            <div id="item-C" class="answer-item"></div>
+        </div>
+    </div>
+</div>
+
+<audio id="countdown-beep-sound" src="https://pomf2.lain.la/f/kxzyuoy.MP31" preload="auto"></audio>
+<audio id="audioJP" preload="auto"></audio>
+
+<script>
+/* 1. KHỞI TẠO ĐÁP ÁN */
+(function initAnswers() {
+    const raw = `{{tiengnhat}}`;
+    const items = raw.split('|');
+    window.correctChoiceId = "";
+    items.forEach(item => {
+        let text = item.trim();
+        let isCorrect = text.startsWith('*');
+        if (isCorrect) text = text.substring(1);
+        const label = text.split(':')[0];
+        const el = document.getElementById("item-" + label);
+        if (el) {
+            el.textContent = text;
+            if (isCorrect) window.correctChoiceId = "item-" + label;
+        }
+    });
+})();
+
+/* 2. LOGIC TỰ ĐỘNG CHUYỂN CẢNH */
+(function(){
+    const countdownEl = document.getElementById("countdown");
+    const standbyWrap = document.getElementById("standby-wrap");
+    const correctLabel = document.getElementById("correct-label");
+    const resultDisplay = document.getElementById("result-display");
+    const beep = document.getElementById("countdown-beep-sound");
+    let isRunning = false;
+
+    window.startCountdownAfterAudio = function(){
+        if (isRunning) return;
+        isRunning = true;
+        standbyWrap.classList.add("hide");
+
+        setTimeout(() => {
+            countdownEl.classList.add("active");
+            beep.play().catch(e => {});
+            let count = 8;
+            countdownEl.textContent = count;
+            let timerId = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    countdownEl.textContent = count;
+                } else {
+                    clearInterval(timerId);
+                    revealFinalResult();
+                }
+            }, 1000);
+        }, 600); 
+    }
+
+    async function revealFinalResult(){
+        // Tắt đếm ngược
+        countdownEl.classList.remove("active");
+        setTimeout(() => { countdownEl.style.display = "none"; }, 500);
+
+        // BƯỚC A: Hiện chữ "正確は" trong 500ms
+        correctLabel.classList.add("show");
+        await new Promise(r => setTimeout(r, 1000));
+        correctLabel.classList.remove("show");
+        await new Promise(r => setTimeout(r, 300)); // Nghỉ ngắn sau khi tắt chữ
+
+        // BƯỚC B: Nhấp nháy đáp án và hiện câu văn
+        if (window.correctChoiceId) {
+            document.getElementById(window.correctChoiceId).classList.add("flash-correct");
+        }
+        document.getElementById("show-notes").textContent = `{{Notes}}`;
+        document.getElementById("show-sentence").textContent = `{{Sentence}}`;
+        resultDisplay.classList.add("show");
+
+        // BƯỚC C: TRÌNH TỰ TTS (TIẾNG NHẬT -> TIẾNG ANH 1.0 -> TIẾNG ANH 0.6)
+        
+        // 1. Đọc tiếng Nhật (Sentence)
+        if (window.triggerSentenceTTS) {
+            await window.triggerSentenceTTS();
+        }
+
+        // 2. Delay 510ms
+        await new Promise(r => setTimeout(r, 510));
+
+        // 3. Đọc tiếng Anh lần 1 (Notes - Speed 1.0)
+        if (window.triggerNotesTTS) {
+            await window.triggerNotesTTS(1.0);
+        }
+
+        // 4. Delay 520ms
+        await new Promise(r => setTimeout(r, 520));
+
+        // 5. Đọc tiếng Anh lần 2 (Notes - Speed 0.6)
+        if (window.triggerNotesTTS) {
+            await window.triggerNotesTTS(0.8);
+        }
+
+        // 6. Delay 2000ms rồi lật thẻ
+        await new Promise(r => setTimeout(r, 2000));
+        if (typeof pycmd === "function") pycmd("ans");
+    }
+})();
+
+/* 3. LOGIC AUDIO & TTS */
+(function(){
+  const NOTES_TEXT = (`{{Notes}}` || "").trim();
+  const SENTENCE_TEXT = (`{{Sentence}}` || "").trim();
+  const API_KEY = "AIzaSyAs1PQ3EPa7NGGxuJL-ZT1Ob1aQLwHiyfc";
+
+  const el = { audio: document.getElementById('audioJP'), firstBtn: document.getElementById('start-learning-btn'), abcText: document.getElementById('abc-text') };
+
+  async function synthTTS(text, voice, rate, lang){
+    const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${API_KEY}`;
+    const body = { input: { text }, voice: { languageCode: lang, name: voice }, audioConfig: { audioEncoding: "MP3", speakingRate: rate } };
+    const res = await fetch(url, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(body) });
+    const data = await res.json();
+    return `data:audio/mp3;base64,${data.audioContent}`;
+  }
+
+  async function playOnce(src){
+    return new Promise((resolve)=>{
+      el.audio.onended = ()=> resolve();
+      el.audio.src = src;
+      el.audio.play().catch(()=>{ if(el.firstBtn) el.firstBtn.style.display="block"; });
+    });
+  }
+
+  // Hàm đọc Sentence (Tiếng Nhật)
+  window.triggerSentenceTTS = async function() {
+      const url = await synthTTS(SENTENCE_TEXT, "ja-JP-Neural2-B", 1.0, "ja-JP");
+      await playOnce(url);
+  };
+
+  // Hàm đọc Notes (Tiếng Anh) với tốc độ tùy biến
+  window.triggerNotesTTS = async function(speed) {
+      const url = await synthTTS(NOTES_TEXT, "en-US-Chirp3-HD-Aoede", speed, "en-US");
+      await playOnce(url);
+  };
+
+  async function runSequence(){
+    const wait = (ms)=> new Promise(r=>setTimeout(r, ms));
+    await wait(200);
+    // Play audio mở đầu (MP3 cũ của bạn)
+    await playOnce("https://files.catbox.moe/vuvhkq.mp3");
+    
+    // Play 1 (Rabbit)
+    el.abcText.textContent = " "; el.abcText.classList.add("play-status");
+    const u1 = await synthTTS(NOTES_TEXT, "en-US-Chirp3-HD-Aoede", 1.0, "en-US"); 
+    await playOnce(u1); 
+    
+    await playOnce("https://pomf2.lain.la/f/9k9honkr.MP3");
+    await wait(600);
+    
+    // Play 2 (Turtle)
+    el.abcText.textContent = " ";
+    const u2 = await synthTTS(NOTES_TEXT, "en-US-Neural2-D", 0.7, "en-US"); 
+    await playOnce(u2); 
+    
+    el.abcText.textContent = ""; el.abcText.classList.remove("play-status");
+    await wait(1500);
+    if (window.startCountdownAfterAudio) window.startCountdownAfterAudio();
+  }
+
+  if (!sessionStorage.getItem("ankiStartedThisSession")) {
+    if(el.firstBtn) el.firstBtn.style.display = "block";
+    window.startSession = async function(){
+      sessionStorage.setItem("ankiStartedThisSession", "yes");
+      el.firstBtn.style.display = "none";
+      await runSequence();
+    };
+  } else {
+    setTimeout(runSequence, 500);
+  }
+})();
+</script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en"> 
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pro Auto Card - 1280px Centered</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Noto+Serif+JP:wght@700&display=swap" rel="stylesheet">
+<style>.quiz-instruction {
+    font-size: 32px;
+    color: #fff; 
+    font-weight: 900;
+    margin-bottom: 25px; /* Tăng khoảng cách dưới một chút cho thoáng */
+    text-align: center;
+    
+    /* --- PHẦN THÊM MỚI: NỀN ĐEN --- */
+    background-color: rgba(0, 0, 0, 0.8); /* Đen mờ 80% để vẫn thấy nền đằng sau nhẹ nhẹ */
+    padding: 15px 35px; /* Khoảng cách từ chữ đến mép nền đen */
+    border-radius: 15px; /* Bo góc cho mượt mà */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Viền mảnh để trông cao cấp hơn */
+    display: inline-block; /* Quan trọng: Để nền đen ôm sát theo độ dài của chữ */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5); /* Đổ bóng cho cái hộp nổi bật lên */
+    /* ------------------------------ */
+
+    width: auto; /* Để inline-block tự quyết định chiều rộng */
+    max-width: 90%; /* Tránh việc chữ quá dài bị chạm mép màn hình */
+    
+    animation: fadeInInstruction 1.0s ease-out forwards;
+}
+
+@keyframes fadeInInstruction {
+    from { 
+        opacity: 0; 
+        transform: translateY(40px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+/* === CẤU HÌNH CỐ ĐỊNH 1280PX === */
+.migaku-card-back { 
+    width: 1680px !important; 
+    max-width: 100% !important; 
+    margin: 0 auto; 
+    background: #1212121; /* Đã sửa mã màu lỗi #1212121 */
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
+    padding-bottom: 40px;
+    min-height: 720px;
+}
+
+.center-container { 
+    display: flex; flex-direction: column; align-items: center; 
+    padding: 20px 20px; 
+}
+
+/* === TÂM ĐIỂM ACTION ZONE === */
+.action-zone {
+    position: relative;
+    width: 100%;
+    height: 350px; /* Tăng nhẹ không gian cho chữ 正確は */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.stack-item {
+    position: absolute;
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    opacity: 0;
+    pointer-events: none;
+    text-align: center;
+}
+
+/* 1. Ảnh Dấu hỏi & Hiệu ứng Bass */
+#standby-wrap { 
+    width: 240px; height: 240px; border-radius: 20%; 
+    background: #0000FF; display: flex; justify-content: center; 
+    align-items: center; opacity: 1; z-index: 3;
+    position: relative;
+    box-shadow: 0 15px 35px rgba(0,0,255,0.4);
+    animation: sound-pulse 1.2s ease-in-out infinite;
+}
+#standby-wrap::before, #standby-wrap::after {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    border: 6px solid #0000FF; border-radius: 20%; z-index: -1; opacity: 0;
+    animation: sonic-wave 1.2s linear infinite;
+}
+#standby-wrap::after { animation-delay: 0.4s; }
+@keyframes sound-pulse { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.08); } 45% { transform: scale(1.04); } }
+@keyframes sonic-wave { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(1.4); opacity: 0; } }
+#standby-wrap.hide { animation: none !important; transform: scale(0) rotate(-180deg); opacity: 0; }
+
+/* 2. Vòng tròn Đếm ngược */
+#countdown { 
+    width: 200px; height: 200px; background: #FF0000; 
+    border-radius: 100%; display: flex; justify-content: center; 
+    align-items: center; color: #fff; font-size: 100px; font-weight: bold; 
+    transform: scale(0.5); z-index: 2;
+}
+#countdown.active { opacity: 1; transform: scale(1); animation: pulseGlow 1s infinite; }
+@keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.6); } 70% { box-shadow: 0 0 0 25px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
+
+/* 3. Văn bản "CHÍNH XÁC LÀ" */
+#correct-label {
+    font-size: 80px;
+    font-weight: 900;
+    color: #FFD54A;
+    text-shadow: 0 0 20px rgba(255, 213, 74, 0.5);
+    z-index: 5;
+    transform: scale(0.8);
+}
+#correct-label.show { opacity: 1; transform: scale(1); }
+
+/* 4. Kết quả Câu văn */
+#result-display { width: 95%; max-width: 1100px; z-index: 4; transform: translateY(30px); }
+#result-display.show { opacity: 1; transform: translateY(0); }
+.res-notes { font-size: 48px; color: #ffd54a; font-weight: 800; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
+.res-sent { font-size: 34px; color: #00e5ff; font-family: "Noto Serif JP", serif; margin-top: 10px; }
+
+/* Đáp án */
+#answer-list-container { display: flex; flex-direction: column; gap: 20px; width: 85%; max-width: 1200px; margin-top: 10px; }
+.answer-item { padding: 18px; background: #1e1e1e; border-radius: 15px; font-size: 34px; border: 2px solid #333; transition: 0.4s; text-align: left;}
+.flash-correct { animation: blinkGreen 0.5s step-end infinite alternate; border-color: #00FF00 !important; font-weight: bold; }
+@keyframes blinkGreen { 50% { background-color: #006400; box-shadow: 0 0 25px rgba(0,255,0,0.4); } }
+</style>
+</head>
+
+<body>
+<div class="migaku-card migaku-card-back">
+    <div class="migaku-header" style="padding:10px; display: flex; gap:10px;">
+        <button id="start-learning-btn" onclick="startSession()" style="background:#4CAF50; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">Bắt đầu học</button>
+        <button onclick="sessionStorage.removeItem('ankiStartedThisSession')" style="background:#444; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">🔄 Reset</button>
+    </div>
+
+    <div class="center-container">
+        <div id="abc-text"></div>
+
+        <div class="action-zone">
+            <div id="standby-wrap" class="stack-item">
+                <img src="https://pomf2.lain.la/f/nnu6vgh9.png" style="width:70%;">
+            </div>    
+            <div id="countdown" class="stack-item">8</div>
+            <div id="correct-label" class="stack-item">正解は… </div>
+            <div id="result-display" class="stack-item">
+                <div id="show-notes" class="res-notes"></div>
+                <div id="show-sentence" class="res-sent"></div>
+            </div>
+        </div>
+<div class="quiz-instruction">今聞いた英語の意味として正しい日本語はどれ？</div>
+        <div id="answer-list-container">
+            <div id="item-A" class="answer-item"></div>
+            <div id="item-B" class="answer-item"></div>
+            <div id="item-C" class="answer-item"></div>
+        </div>
+    </div>
+</div>
+
+<audio id="countdown-beep-sound" src="https://pomf2.lain.la/f/kxzyuoy.MP31" preload="auto"></audio>
+<audio id="audioJP" preload="auto"></audio>
+
+<script>
+/* 1. KHỞI TẠO ĐÁP ÁN */
+(function initAnswers() {
+    const raw = `{{tiengnhat}}`;
+    const items = raw.split('|');
+    window.correctChoiceId = "";
+    items.forEach(item => {
+        let text = item.trim();
+        let isCorrect = text.startsWith('*');
+        if (isCorrect) text = text.substring(1);
+        const label = text.split(':')[0];
+        const el = document.getElementById("item-" + label);
+        if (el) {
+            el.textContent = text;
+            if (isCorrect) window.correctChoiceId = "item-" + label;
+        }
+    });
+})();
+
+/* 2. LOGIC TỰ ĐỘNG CHUYỂN CẢNH */
+(function(){
+    const countdownEl = document.getElementById("countdown");
+    const standbyWrap = document.getElementById("standby-wrap");
+    const correctLabel = document.getElementById("correct-label");
+    const resultDisplay = document.getElementById("result-display");
+    const beep = document.getElementById("countdown-beep-sound");
+    let isRunning = false;
+
+    window.startCountdownAfterAudio = function(){
+        if (isRunning) return;
+        isRunning = true;
+        standbyWrap.classList.add("hide");
+
+        setTimeout(() => {
+            countdownEl.classList.add("active");
+            beep.play().catch(e => {});
+            let count = 8;
+            countdownEl.textContent = count;
+            let timerId = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    countdownEl.textContent = count;
+                } else {
+                    clearInterval(timerId);
+                    revealFinalResult();
+                }
+            }, 1000);
+        }, 600); 
+    }
+
+    async function revealFinalResult(){
+        // Tắt đếm ngược
+        countdownEl.classList.remove("active");
+        setTimeout(() => { countdownEl.style.display = "none"; }, 500);
+
+        // BƯỚC A: Hiện chữ "正確は" trong 500ms
+        correctLabel.classList.add("show");
+        await new Promise(r => setTimeout(r, 1000));
+        correctLabel.classList.remove("show");
+        await new Promise(r => setTimeout(r, 300)); // Nghỉ ngắn sau khi tắt chữ
+
+        // BƯỚC B: Nhấp nháy đáp án và hiện câu văn
+        if (window.correctChoiceId) {
+            document.getElementById(window.correctChoiceId).classList.add("flash-correct");
+        }
+        document.getElementById("show-notes").textContent = `{{Notes}}`;
+        document.getElementById("show-sentence").textContent = `{{Sentence}}`;
+        resultDisplay.classList.add("show");
+
+        // BƯỚC C: TRÌNH TỰ TTS (TIẾNG NHẬT -> TIẾNG ANH 1.0 -> TIẾNG ANH 0.6)
+        
+        // 1. Đọc tiếng Nhật (Sentence)
+        if (window.triggerSentenceTTS) {
+            await window.triggerSentenceTTS();
+        }
+
+        // 2. Delay 510ms
+        await new Promise(r => setTimeout(r, 510));
+
+        // 3. Đọc tiếng Anh lần 1 (Notes - Speed 1.0)
+        if (window.triggerNotesTTS) {
+            await window.triggerNotesTTS(1.0);
+        }
+
+        // 4. Delay 520ms
+        await new Promise(r => setTimeout(r, 520));
+
+        // 5. Đọc tiếng Anh lần 2 (Notes - Speed 0.6)
+        if (window.triggerNotesTTS) {
+            await window.triggerNotesTTS(0.8);
+        }
+
+        // 6. Delay 2000ms rồi lật thẻ
+        await new Promise(r => setTimeout(r, 2000));
+        if (typeof pycmd === "function") pycmd("ans");
+    }
+})();
+
+/* 3. LOGIC AUDIO & TTS */
+(function(){
+  const NOTES_TEXT = (`{{Notes}}` || "").trim();
+  const SENTENCE_TEXT = (`{{Sentence}}` || "").trim();
+  const API_KEY = "AIzaSyAs1PQ3EPa7NGGxuJL-ZT1Ob1aQLwHiyfc";
+
+  const el = { audio: document.getElementById('audioJP'), firstBtn: document.getElementById('start-learning-btn'), abcText: document.getElementById('abc-text') };
+
+  async function synthTTS(text, voice, rate, lang){
+    const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${API_KEY}`;
+    const body = { input: { text }, voice: { languageCode: lang, name: voice }, audioConfig: { audioEncoding: "MP3", speakingRate: rate } };
+    const res = await fetch(url, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(body) });
+    const data = await res.json();
+    return `data:audio/mp3;base64,${data.audioContent}`;
+  }
+
+  async function playOnce(src){
+    return new Promise((resolve)=>{
+      el.audio.onended = ()=> resolve();
+      el.audio.src = src;
+      el.audio.play().catch(()=>{ if(el.firstBtn) el.firstBtn.style.display="block"; });
+    });
+  }
+
+  // Hàm đọc Sentence (Tiếng Nhật)
+  window.triggerSentenceTTS = async function() {
+      const url = await synthTTS(SENTENCE_TEXT, "ja-JP-Neural2-B", 1.0, "ja-JP");
+      await playOnce(url);
+  };
+
+  // Hàm đọc Notes (Tiếng Anh) với tốc độ tùy biến
+  window.triggerNotesTTS = async function(speed) {
+      const url = await synthTTS(NOTES_TEXT, "en-US-Chirp3-HD-Aoede", speed, "en-US");
+      await playOnce(url);
+  };
+
+  async function runSequence(){
+    const wait = (ms)=> new Promise(r=>setTimeout(r, ms));
+    await wait(200);
+    // Play audio mở đầu (MP3 cũ của bạn)
+    await playOnce("https://files.catbox.moe/vuvhkq.mp3");
+    
+    // Play 1 (Rabbit)
+    el.abcText.textContent = " "; el.abcText.classList.add("play-status");
+    const u1 = await synthTTS(NOTES_TEXT, "en-US-Chirp3-HD-Aoede", 1.0, "en-US"); 
+    await playOnce(u1); 
+    
+    await playOnce("https://pomf2.lain.la/f/9k9honkr.MP3");
+    await wait(600);
+    
+    // Play 2 (Turtle)
+    el.abcText.textContent = " ";
+    const u2 = await synthTTS(NOTES_TEXT, "en-US-Neural2-D", 0.7, "en-US"); 
+    await playOnce(u2); 
+    
+    el.abcText.textContent = ""; el.abcText.classList.remove("play-status");
+    await wait(1500);
+    if (window.startCountdownAfterAudio) window.startCountdownAfterAudio();
+  }
+
+  if (!sessionStorage.getItem("ankiStartedThisSession")) {
+    if(el.firstBtn) el.firstBtn.style.display = "block";
+    window.startSession = async function(){
+      sessionStorage.setItem("ankiStartedThisSession", "yes");
+      el.firstBtn.style.display = "none";
+      await runSequence();
+    };
+  } else {
+    setTimeout(runSequence, 500);
+  }
+})();
+</script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en"> 
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pro Auto Card - 1280px Centered</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Noto+Serif+JP:wght@700&display=swap" rel="stylesheet">
+<style>.quiz-instruction {
+    font-size: 32px;
+    color: #fff; 
+    font-weight: 900;
+    margin-bottom: 25px; /* Tăng khoảng cách dưới một chút cho thoáng */
+    text-align: center;
+    
+    /* --- PHẦN THÊM MỚI: NỀN ĐEN --- */
+    background-color: rgba(0, 0, 0, 0.8); /* Đen mờ 80% để vẫn thấy nền đằng sau nhẹ nhẹ */
+    padding: 15px 35px; /* Khoảng cách từ chữ đến mép nền đen */
+    border-radius: 15px; /* Bo góc cho mượt mà */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Viền mảnh để trông cao cấp hơn */
+    display: inline-block; /* Quan trọng: Để nền đen ôm sát theo độ dài của chữ */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5); /* Đổ bóng cho cái hộp nổi bật lên */
+    /* ------------------------------ */
+
+    width: auto; /* Để inline-block tự quyết định chiều rộng */
+    max-width: 90%; /* Tránh việc chữ quá dài bị chạm mép màn hình */
+    
+    animation: fadeInInstruction 1.0s ease-out forwards;
+}
+
+@keyframes fadeInInstruction {
+    from { 
+        opacity: 0; 
+        transform: translateY(40px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+/* === CẤU HÌNH CỐ ĐỊNH 1280PX === */
+.migaku-card-back { 
+    width: 1680px !important; 
+    max-width: 100% !important; 
+    margin: 0 auto; 
+    background: #1212121; /* Đã sửa mã màu lỗi #1212121 */
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
+    padding-bottom: 40px;
+    min-height: 720px;
+}
+
+.center-container { 
+    display: flex; flex-direction: column; align-items: center; 
+    padding: 20px 20px; 
+}
+
+/* === TÂM ĐIỂM ACTION ZONE === */
+.action-zone {
+    position: relative;
+    width: 100%;
+    height: 350px; /* Tăng nhẹ không gian cho chữ 正確は */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.stack-item {
+    position: absolute;
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    opacity: 0;
+    pointer-events: none;
+    text-align: center;
+}
+
+/* 1. Ảnh Dấu hỏi & Hiệu ứng Bass */
+#standby-wrap { 
+    width: 240px; height: 240px; border-radius: 20%; 
+    background: #0000FF; display: flex; justify-content: center; 
+    align-items: center; opacity: 1; z-index: 3;
+    position: relative;
+    box-shadow: 0 15px 35px rgba(0,0,255,0.4);
+    animation: sound-pulse 1.2s ease-in-out infinite;
+}
+#standby-wrap::before, #standby-wrap::after {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    border: 6px solid #0000FF; border-radius: 20%; z-index: -1; opacity: 0;
+    animation: sonic-wave 1.2s linear infinite;
+}
+#standby-wrap::after { animation-delay: 0.4s; }
+@keyframes sound-pulse { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.08); } 45% { transform: scale(1.04); } }
+@keyframes sonic-wave { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(1.4); opacity: 0; } }
+#standby-wrap.hide { animation: none !important; transform: scale(0) rotate(-180deg); opacity: 0; }
+
+/* 2. Vòng tròn Đếm ngược */
+#countdown { 
+    width: 200px; height: 200px; background: #FF0000; 
+    border-radius: 100%; display: flex; justify-content: center; 
+    align-items: center; color: #fff; font-size: 100px; font-weight: bold; 
+    transform: scale(0.5); z-index: 2;
+}
+#countdown.active { opacity: 1; transform: scale(1); animation: pulseGlow 1s infinite; }
+@keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.6); } 70% { box-shadow: 0 0 0 25px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
+
+/* 3. Văn bản "CHÍNH XÁC LÀ" */
+#correct-label {
+    font-size: 80px;
+    font-weight: 900;
+    color: #FFD54A;
+    text-shadow: 0 0 20px rgba(255, 213, 74, 0.5);
+    z-index: 5;
+    transform: scale(0.8);
+}
+#correct-label.show { opacity: 1; transform: scale(1); }
+
+/* 4. Kết quả Câu văn */
+#result-display { width: 95%; max-width: 1100px; z-index: 4; transform: translateY(30px); }
+#result-display.show { opacity: 1; transform: translateY(0); }
+.res-notes { font-size: 48px; color: #ffd54a; font-weight: 800; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
+.res-sent { font-size: 34px; color: #00e5ff; font-family: "Noto Serif JP", serif; margin-top: 10px; }
+
+/* Đáp án */
+#answer-list-container { display: flex; flex-direction: column; gap: 20px; width: 85%; max-width: 1200px; margin-top: 10px; }
+.answer-item { padding: 18px; background: #1e1e1e; border-radius: 15px; font-size: 34px; border: 2px solid #333; transition: 0.4s; text-align: left;}
+.flash-correct { animation: blinkGreen 0.5s step-end infinite alternate; border-color: #00FF00 !important; font-weight: bold; }
+@keyframes blinkGreen { 50% { background-color: #006400; box-shadow: 0 0 25px rgba(0,255,0,0.4); } }
+</style>
+</head>
+
+<body>
+<div class="migaku-card migaku-card-back">
+    <div class="migaku-header" style="padding:10px; display: flex; gap:10px;">
+        <button id="start-learning-btn" onclick="startSession()" style="background:#4CAF50; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">Bắt đầu học</button>
+        <button onclick="sessionStorage.removeItem('ankiStartedThisSession')" style="background:#444; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">🔄 Reset</button>
+    </div>
+
+    <div class="center-container">
+        <div id="abc-text"></div>
+
+        <div class="action-zone">
+            <div id="standby-wrap" class="stack-item">
+                <img src="https://pomf2.lain.la/f/nnu6vgh9.png" style="width:70%;">
+            </div>    
+            <div id="countdown" class="stack-item">8</div>
+            <div id="correct-label" class="stack-item">正解は… </div>
+            <div id="result-display" class="stack-item">
+                <div id="show-notes" class="res-notes"></div>
+                <div id="show-sentence" class="res-sent"></div>
+            </div>
+        </div>
+<div class="quiz-instruction">今聞いた英語の意味として正しい日本語はどれ？</div>
+        <div id="answer-list-container">
+            <div id="item-A" class="answer-item"></div>
+            <div id="item-B" class="answer-item"></div>
+            <div id="item-C" class="answer-item"></div>
+        </div>
+    </div>
+</div>
+
+<audio id="countdown-beep-sound" src="https://pomf2.lain.la/f/kxzyuoy.MP31" preload="auto"></audio>
+<audio id="audioJP" preload="auto"></audio>
+
+<script>
+/* 1. KHỞI TẠO ĐÁP ÁN */
+(function initAnswers() {
+    const raw = `{{tiengnhat}}`;
+    const items = raw.split('|');
+    window.correctChoiceId = "";
+    items.forEach(item => {
+        let text = item.trim();
+        let isCorrect = text.startsWith('*');
+        if (isCorrect) text = text.substring(1);
+        const label = text.split(':')[0];
+        const el = document.getElementById("item-" + label);
+        if (el) {
+            el.textContent = text;
+            if (isCorrect) window.correctChoiceId = "item-" + label;
+        }
+    });
+})();
+
+/* 2. LOGIC TỰ ĐỘNG CHUYỂN CẢNH */
+(function(){
+    const countdownEl = document.getElementById("countdown");
+    const standbyWrap = document.getElementById("standby-wrap");
+    const correctLabel = document.getElementById("correct-label");
+    const resultDisplay = document.getElementById("result-display");
+    const beep = document.getElementById("countdown-beep-sound");
+    let isRunning = false;
+
+    window.startCountdownAfterAudio = function(){
+        if (isRunning) return;
+        isRunning = true;
+        standbyWrap.classList.add("hide");
+
+        setTimeout(() => {
+            countdownEl.classList.add("active");
+            beep.play().catch(e => {});
+            let count = 8;
+            countdownEl.textContent = count;
+            let timerId = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    countdownEl.textContent = count;
+                } else {
+                    clearInterval(timerId);
+                    revealFinalResult();
+                }
+            }, 1000);
+        }, 600); 
+    }
+
+    async function revealFinalResult(){
+        // Tắt đếm ngược
+        countdownEl.classList.remove("active");
+        setTimeout(() => { countdownEl.style.display = "none"; }, 500);
+
+        // BƯỚC A: Hiện chữ "正確は" trong 500ms
+        correctLabel.classList.add("show");
+        await new Promise(r => setTimeout(r, 1000));
+        correctLabel.classList.remove("show");
+        await new Promise(r => setTimeout(r, 300)); // Nghỉ ngắn sau khi tắt chữ
+
+        // BƯỚC B: Nhấp nháy đáp án và hiện câu văn
+        if (window.correctChoiceId) {
+            document.getElementById(window.correctChoiceId).classList.add("flash-correct");
+        }
+        document.getElementById("show-notes").textContent = `{{Notes}}`;
+        document.getElementById("show-sentence").textContent = `{{Sentence}}`;
+        resultDisplay.classList.add("show");
+
+        // BƯỚC C: TRÌNH TỰ TTS (TIẾNG NHẬT -> TIẾNG ANH 1.0 -> TIẾNG ANH 0.6)
+        
+        // 1. Đọc tiếng Nhật (Sentence)
+        if (window.triggerSentenceTTS) {
+            await window.triggerSentenceTTS();
+        }
+
+        // 2. Delay 510ms
+        await new Promise(r => setTimeout(r, 510));
+
+        // 3. Đọc tiếng Anh lần 1 (Notes - Speed 1.0)
+        if (window.triggerNotesTTS) {
+            await window.triggerNotesTTS(1.0);
+        }
+
+        // 4. Delay 520ms
+        await new Promise(r => setTimeout(r, 520));
+
+        // 5. Đọc tiếng Anh lần 2 (Notes - Speed 0.6)
+        if (window.triggerNotesTTS) {
+            await window.triggerNotesTTS(0.8);
+        }
+
+        // 6. Delay 2000ms rồi lật thẻ
+        await new Promise(r => setTimeout(r, 2000));
+        if (typeof pycmd === "function") pycmd("ans");
+    }
+})();
+
+/* 3. LOGIC AUDIO & TTS */
+(function(){
+  const NOTES_TEXT = (`{{Notes}}` || "").trim();
+  const SENTENCE_TEXT = (`{{Sentence}}` || "").trim();
+  const API_KEY = "AIzaSyAs1PQ3EPa7NGGxuJL-ZT1Ob1aQLwHiyfc";
+
+  const el = { audio: document.getElementById('audioJP'), firstBtn: document.getElementById('start-learning-btn'), abcText: document.getElementById('abc-text') };
+
+  async function synthTTS(text, voice, rate, lang){
+    const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${API_KEY}`;
+    const body = { input: { text }, voice: { languageCode: lang, name: voice }, audioConfig: { audioEncoding: "MP3", speakingRate: rate } };
+    const res = await fetch(url, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(body) });
+    const data = await res.json();
+    return `data:audio/mp3;base64,${data.audioContent}`;
+  }
+
+  async function playOnce(src){
+    return new Promise((resolve)=>{
+      el.audio.onended = ()=> resolve();
+      el.audio.src = src;
+      el.audio.play().catch(()=>{ if(el.firstBtn) el.firstBtn.style.display="block"; });
+    });
+  }
+
+  // Hàm đọc Sentence (Tiếng Nhật)
+  window.triggerSentenceTTS = async function() {
+      const url = await synthTTS(SENTENCE_TEXT, "ja-JP-Neural2-B", 1.0, "ja-JP");
+      await playOnce(url);
+  };
+
+  // Hàm đọc Notes (Tiếng Anh) với tốc độ tùy biến
+  window.triggerNotesTTS = async function(speed) {
+      const url = await synthTTS(NOTES_TEXT, "en-US-Chirp3-HD-Aoede", speed, "en-US");
+      await playOnce(url);
+  };
+
+  async function runSequence(){
+    const wait = (ms)=> new Promise(r=>setTimeout(r, ms));
+    await wait(200);
+    // Play audio mở đầu (MP3 cũ của bạn)
+    await playOnce("https://files.catbox.moe/vuvhkq.mp3");
+    
+    // Play 1 (Rabbit)
+    el.abcText.textContent = " "; el.abcText.classList.add("play-status");
+    const u1 = await synthTTS(NOTES_TEXT, "en-US-Chirp3-HD-Aoede", 1.0, "en-US"); 
+    await playOnce(u1); 
+    
+    await playOnce("https://pomf2.lain.la/f/9k9honkr.MP3");
+    await wait(600);
+    
+    // Play 2 (Turtle)
+    el.abcText.textContent = " ";
+    const u2 = await synthTTS(NOTES_TEXT, "en-US-Neural2-D", 0.7, "en-US"); 
+    await playOnce(u2); 
+    
+    el.abcText.textContent = ""; el.abcText.classList.remove("play-status");
+    await wait(1500);
+    if (window.startCountdownAfterAudio) window.startCountdownAfterAudio();
+  }
+
+  if (!sessionStorage.getItem("ankiStartedThisSession")) {
+    if(el.firstBtn) el.firstBtn.style.display = "block";
+    window.startSession = async function(){
+      sessionStorage.setItem("ankiStartedThisSession", "yes");
+      el.firstBtn.style.display = "none";
+      await runSequence();
+    };
+  } else {
+    setTimeout(runSequence, 500);
+  }
+})();
+</script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en"> 
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pro Auto Card - 1280px Centered</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Noto+Serif+JP:wght@700&display=swap" rel="stylesheet">
+<style>.quiz-instruction {
+    font-size: 32px;
+    color: #fff; 
+    font-weight: 900;
+    margin-bottom: 25px; /* Tăng khoảng cách dưới một chút cho thoáng */
+    text-align: center;
+    
+    /* --- PHẦN THÊM MỚI: NỀN ĐEN --- */
+    background-color: rgba(0, 0, 0, 0.8); /* Đen mờ 80% để vẫn thấy nền đằng sau nhẹ nhẹ */
+    padding: 15px 35px; /* Khoảng cách từ chữ đến mép nền đen */
+    border-radius: 15px; /* Bo góc cho mượt mà */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Viền mảnh để trông cao cấp hơn */
+    display: inline-block; /* Quan trọng: Để nền đen ôm sát theo độ dài của chữ */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5); /* Đổ bóng cho cái hộp nổi bật lên */
+    /* ------------------------------ */
+
+    width: auto; /* Để inline-block tự quyết định chiều rộng */
+    max-width: 90%; /* Tránh việc chữ quá dài bị chạm mép màn hình */
+    
+    animation: fadeInInstruction 1.0s ease-out forwards;
+}
+
+@keyframes fadeInInstruction {
+    from { 
+        opacity: 0; 
+        transform: translateY(40px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+/* === CẤU HÌNH CỐ ĐỊNH 1280PX === */
+.migaku-card-back { 
+    width: 1680px !important; 
+    max-width: 100% !important; 
+    margin: 0 auto; 
+    background: #1212121; /* Đã sửa mã màu lỗi #1212121 */
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
+    padding-bottom: 40px;
+    min-height: 720px;
+}
+
+.center-container { 
+    display: flex; flex-direction: column; align-items: center; 
+    padding: 20px 20px; 
+}
+
+/* === TÂM ĐIỂM ACTION ZONE === */
+.action-zone {
+    position: relative;
+    width: 100%;
+    height: 350px; /* Tăng nhẹ không gian cho chữ 正確は */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.stack-item {
+    position: absolute;
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    opacity: 0;
+    pointer-events: none;
+    text-align: center;
+}
+
+/* 1. Ảnh Dấu hỏi & Hiệu ứng Bass */
+#standby-wrap { 
+    width: 240px; height: 240px; border-radius: 20%; 
+    background: #0000FF; display: flex; justify-content: center; 
+    align-items: center; opacity: 1; z-index: 3;
+    position: relative;
+    box-shadow: 0 15px 35px rgba(0,0,255,0.4);
+    animation: sound-pulse 1.2s ease-in-out infinite;
+}
+#standby-wrap::before, #standby-wrap::after {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    border: 6px solid #0000FF; border-radius: 20%; z-index: -1; opacity: 0;
+    animation: sonic-wave 1.2s linear infinite;
+}
+#standby-wrap::after { animation-delay: 0.4s; }
+@keyframes sound-pulse { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.08); } 45% { transform: scale(1.04); } }
+@keyframes sonic-wave { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(1.4); opacity: 0; } }
+#standby-wrap.hide { animation: none !important; transform: scale(0) rotate(-180deg); opacity: 0; }
+
+/* 2. Vòng tròn Đếm ngược */
+#countdown { 
+    width: 200px; height: 200px; background: #FF0000; 
+    border-radius: 100%; display: flex; justify-content: center; 
+    align-items: center; color: #fff; font-size: 100px; font-weight: bold; 
+    transform: scale(0.5); z-index: 2;
+}
+#countdown.active { opacity: 1; transform: scale(1); animation: pulseGlow 1s infinite; }
+@keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.6); } 70% { box-shadow: 0 0 0 25px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
+
+/* 3. Văn bản "CHÍNH XÁC LÀ" */
+#correct-label {
+    font-size: 80px;
+    font-weight: 900;
+    color: #FFD54A;
+    text-shadow: 0 0 20px rgba(255, 213, 74, 0.5);
+    z-index: 5;
+    transform: scale(0.8);
+}
+#correct-label.show { opacity: 1; transform: scale(1); }
+
+/* 4. Kết quả Câu văn */
+#result-display { width: 95%; max-width: 1100px; z-index: 4; transform: translateY(30px); }
+#result-display.show { opacity: 1; transform: translateY(0); }
+.res-notes { font-size: 48px; color: #ffd54a; font-weight: 800; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
+.res-sent { font-size: 34px; color: #00e5ff; font-family: "Noto Serif JP", serif; margin-top: 10px; }
+
+/* Đáp án */
+#answer-list-container { display: flex; flex-direction: column; gap: 20px; width: 85%; max-width: 1200px; margin-top: 10px; }
+.answer-item { padding: 18px; background: #1e1e1e; border-radius: 15px; font-size: 34px; border: 2px solid #333; transition: 0.4s; text-align: left;}
+.flash-correct { animation: blinkGreen 0.5s step-end infinite alternate; border-color: #00FF00 !important; font-weight: bold; }
+@keyframes blinkGreen { 50% { background-color: #006400; box-shadow: 0 0 25px rgba(0,255,0,0.4); } }
+</style>
+</head>
+
+<body>
+<div class="migaku-card migaku-card-back">
+    <div class="migaku-header" style="padding:10px; display: flex; gap:10px;">
+        <button id="start-learning-btn" onclick="startSession()" style="background:#4CAF50; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">Bắt đầu học</button>
+        <button onclick="sessionStorage.removeItem('ankiStartedThisSession')" style="background:#444; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">🔄 Reset</button>
+    </div>
+
+    <div class="center-container">
+        <div id="abc-text"></div>
+
+        <div class="action-zone">
+            <div id="standby-wrap" class="stack-item">
+                <img src="https://pomf2.lain.la/f/nnu6vgh9.png" style="width:70%;">
+            </div>    
+            <div id="countdown" class="stack-item">8</div>
+            <div id="correct-label" class="stack-item">正解は… </div>
+            <div id="result-display" class="stack-item">
+                <div id="show-notes" class="res-notes"></div>
+                <div id="show-sentence" class="res-sent"></div>
+            </div>
+        </div>
+<div class="quiz-instruction">今聞いた英語の意味として正しい日本語はどれ？</div>
+        <div id="answer-list-container">
+            <div id="item-A" class="answer-item"></div>
+            <div id="item-B" class="answer-item"></div>
+            <div id="item-C" class="answer-item"></div>
+        </div>
+    </div>
+</div>
+
+<audio id="countdown-beep-sound" src="https://pomf2.lain.la/f/kxzyuoy.MP31" preload="auto"></audio>
+<audio id="audioJP" preload="auto"></audio>
+
+<script>
+/* 1. KHỞI TẠO ĐÁP ÁN */
+(function initAnswers() {
+    const raw = `{{tiengnhat}}`;
+    const items = raw.split('|');
+    window.correctChoiceId = "";
+    items.forEach(item => {
+        let text = item.trim();
+        let isCorrect = text.startsWith('*');
+        if (isCorrect) text = text.substring(1);
+        const label = text.split(':')[0];
+        const el = document.getElementById("item-" + label);
+        if (el) {
+            el.textContent = text;
+            if (isCorrect) window.correctChoiceId = "item-" + label;
+        }
+    });
+})();
+
+/* 2. LOGIC TỰ ĐỘNG CHUYỂN CẢNH */
+(function(){
+    const countdownEl = document.getElementById("countdown");
+    const standbyWrap = document.getElementById("standby-wrap");
+    const correctLabel = document.getElementById("correct-label");
+    const resultDisplay = document.getElementById("result-display");
+    const beep = document.getElementById("countdown-beep-sound");
+    let isRunning = false;
+
+    window.startCountdownAfterAudio = function(){
+        if (isRunning) return;
+        isRunning = true;
+        standbyWrap.classList.add("hide");
+
+        setTimeout(() => {
+            countdownEl.classList.add("active");
+            beep.play().catch(e => {});
+            let count = 8;
+            countdownEl.textContent = count;
+            let timerId = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    countdownEl.textContent = count;
+                } else {
+                    clearInterval(timerId);
+                    revealFinalResult();
+                }
+            }, 1000);
+        }, 600); 
+    }
+
+    async function revealFinalResult(){
+        // Tắt đếm ngược
+        countdownEl.classList.remove("active");
+        setTimeout(() => { countdownEl.style.display = "none"; }, 500);
+
+        // BƯỚC A: Hiện chữ "正確は" trong 500ms
+        correctLabel.classList.add("show");
+        await new Promise(r => setTimeout(r, 1000));
+        correctLabel.classList.remove("show");
+        await new Promise(r => setTimeout(r, 300)); // Nghỉ ngắn sau khi tắt chữ
+
+        // BƯỚC B: Nhấp nháy đáp án và hiện câu văn
+        if (window.correctChoiceId) {
+            document.getElementById(window.correctChoiceId).classList.add("flash-correct");
+        }
+        document.getElementById("show-notes").textContent = `{{Notes}}`;
+        document.getElementById("show-sentence").textContent = `{{Sentence}}`;
+        resultDisplay.classList.add("show");
+
+        // BƯỚC C: TRÌNH TỰ TTS (TIẾNG NHẬT -> TIẾNG ANH 1.0 -> TIẾNG ANH 0.6)
+        
+        // 1. Đọc tiếng Nhật (Sentence)
+        if (window.triggerSentenceTTS) {
+            await window.triggerSentenceTTS();
+        }
+
+        // 2. Delay 510ms
+        await new Promise(r => setTimeout(r, 510));
+
+        // 3. Đọc tiếng Anh lần 1 (Notes - Speed 1.0)
+        if (window.triggerNotesTTS) {
+            await window.triggerNotesTTS(1.0);
+        }
+
+        // 4. Delay 520ms
+        await new Promise(r => setTimeout(r, 520));
+
+        // 5. Đọc tiếng Anh lần 2 (Notes - Speed 0.6)
+        if (window.triggerNotesTTS) {
+            await window.triggerNotesTTS(0.8);
+        }
+
+        // 6. Delay 2000ms rồi lật thẻ
+        await new Promise(r => setTimeout(r, 2000));
+        if (typeof pycmd === "function") pycmd("ans");
+    }
+})();
+
+/* 3. LOGIC AUDIO & TTS */
+(function(){
+  const NOTES_TEXT = (`{{Notes}}` || "").trim();
+  const SENTENCE_TEXT = (`{{Sentence}}` || "").trim();
+  const API_KEY = "AIzaSyAs1PQ3EPa7NGGxuJL-ZT1Ob1aQLwHiyfc";
+
+  const el = { audio: document.getElementById('audioJP'), firstBtn: document.getElementById('start-learning-btn'), abcText: document.getElementById('abc-text') };
+
+  async function synthTTS(text, voice, rate, lang){
+    const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${API_KEY}`;
+    const body = { input: { text }, voice: { languageCode: lang, name: voice }, audioConfig: { audioEncoding: "MP3", speakingRate: rate } };
+    const res = await fetch(url, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(body) });
+    const data = await res.json();
+    return `data:audio/mp3;base64,${data.audioContent}`;
+  }
+
+  async function playOnce(src){
+    return new Promise((resolve)=>{
+      el.audio.onended = ()=> resolve();
+      el.audio.src = src;
+      el.audio.play().catch(()=>{ if(el.firstBtn) el.firstBtn.style.display="block"; });
+    });
+  }
+
+  // Hàm đọc Sentence (Tiếng Nhật)
+  window.triggerSentenceTTS = async function() {
+      const url = await synthTTS(SENTENCE_TEXT, "ja-JP-Neural2-B", 1.0, "ja-JP");
+      await playOnce(url);
+  };
+
+  // Hàm đọc Notes (Tiếng Anh) với tốc độ tùy biến
+  window.triggerNotesTTS = async function(speed) {
+      const url = await synthTTS(NOTES_TEXT, "en-US-Chirp3-HD-Aoede", speed, "en-US");
+      await playOnce(url);
+  };
+
+  async function runSequence(){
+    const wait = (ms)=> new Promise(r=>setTimeout(r, ms));
+    await wait(200);
+    // Play audio mở đầu (MP3 cũ của bạn)
+    await playOnce("https://files.catbox.moe/vuvhkq.mp3");
+    
+    // Play 1 (Rabbit)
+    el.abcText.textContent = " "; el.abcText.classList.add("play-status");
+    const u1 = await synthTTS(NOTES_TEXT, "en-US-Chirp3-HD-Aoede", 1.0, "en-US"); 
+    await playOnce(u1); 
+    
+    await playOnce("https://pomf2.lain.la/f/9k9honkr.MP3");
+    await wait(600);
+    
+    // Play 2 (Turtle)
+    el.abcText.textContent = " ";
+    const u2 = await synthTTS(NOTES_TEXT, "en-US-Neural2-D", 0.7, "en-US"); 
+    await playOnce(u2); 
+    
+    el.abcText.textContent = ""; el.abcText.classList.remove("play-status");
+    await wait(1500);
+    if (window.startCountdownAfterAudio) window.startCountdownAfterAudio();
+  }
+
+  if (!sessionStorage.getItem("ankiStartedThisSession")) {
+    if(el.firstBtn) el.firstBtn.style.display = "block";
+    window.startSession = async function(){
+      sessionStorage.setItem("ankiStartedThisSession", "yes");
+      el.firstBtn.style.display = "none";
+      await runSequence();
+    };
+  } else {
+    setTimeout(runSequence, 500);
+  }
+})();
+</script>
 </body>
 </html>

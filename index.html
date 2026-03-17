@@ -31,7 +31,7 @@
   <div class="hint">
     Xuất CSV <b>không header</b>. Mapping hiện tại của bạn đang là <b>7 cột</b>:<br>
     <code>1) JP | 2) Analysis | 3) Key phrase | 4) (trống) | 5) Image | 6) (trống) | 7) EN</code><br>
-    Dán dữ liệu → Preview → Tải CSV → Import trong Anki và map theo đúng thứ tự cột.13:37
+    Dán dữ liệu → Preview → Tải CSV → Import trong Anki và map theo đúng thứ tự cột.13:371
   </div>
 
   <div class="row">
@@ -87,8 +87,9 @@ function parseBlocks(text){
   const rows = [];
 
   for(const part of parts){
-    const jp  = pickSection(part, "日本語文");
+    
     const en  = pickSection(part, "英語文");
+    const jp  = pickSection(part, "日本語文");
     const an  = pickLineOrMulti(part, "🔎");
     
     const q = pickLineOrMulti(part, "👍");
